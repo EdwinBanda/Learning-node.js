@@ -1,28 +1,51 @@
 const express = require('express')
 const app = express()
-const bodyParser = require('body-parser')
 const port = 8081
+const handlebars = require('express-handlebars')
+const bodyparser = require('body-parser')
+const post = require('./models/Post')
 
-app.use(bodyParser.urlencoded({extended: true }))
 
-app.get('/', (req, res)=>{
-    // const nome = req.params.nome
-    res.sendFile(__dirname + "/html/index.html")
-})
 
-app.get('/sobre', (req, res)=>{
-    res.sendFile(__dirname + "/html/sobre.html")
-})
+// Config
+    // Template engine
+        app.engine('handlebars', handlebars.engine({defaultLayout: 'main'}))
+        app.set('view engine', 'handlebars')
 
-app.get('/blog', (req, res)=>{
-    res.send("Bem vindos ao meu blog")
-})
+    // Bodyparser
+    app.use(bodyparser.urlencoded({extended: false}))
+    app.use(bodyparser.json())
 
-app.get('/ola/:cargo/:nome', (req, res)=>{
-    res.send("<h1>Ola "+req.params.nome+" </h1>"+"Seu cargo eh "+req.params.cargo)
-})
+// Rotas
+    app.get('/', (req,res)=>{
+        post.findAll({order: [['id','DESC']]})
+            .then((posts)=>{
+                // console.log(posts)
+                res.render('home', {posts: posts})
+            })
+    })
+
+    app.get('/cad', (req, res)=>{
+        res.render('formulario')
+    })
+
+    app.post('/add', (req, res)=>{
+        post.create({
+            titulo: req.body.titulo,
+            conteudo: req.body.conteudo
+        }).then(()=>{
+            res.redirect('/')
+        })
+        .catch((erro)=>{
+            res.send('Houve um erro! '+erro)
+        })
+
+    })
+
+
+
 
 
 app.listen(port, ()=>{
-    console.log("Servidor rodando!")
+    console.log("Servidor rodando na url http://localhost:8081")
 })
