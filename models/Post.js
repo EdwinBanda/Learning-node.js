@@ -10,6 +10,6 @@ const post = db.sequelize.define('postagens',{
     
 })
 
-//post.sync({force: true})
+// post.sync({force: true})
 
 module.exports = post

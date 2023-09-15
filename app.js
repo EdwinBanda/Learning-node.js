@@ -39,11 +39,17 @@ const post = require('./models/Post')
         .catch((erro)=>{
             res.send('Houve um erro! '+erro)
         })
-
     })
 
-
-
+    app.get('/deletar/:id', (req,res)=>{
+        post.destroy({where: {'id': req.params.id}})
+            .then(()=>{
+                res.redirect('/')
+            })
+            .catch((erro)=>{
+                res.send('Esta postagem nao existe! '+erro)
+            })
+    })
 
 
 app.listen(port, ()=>{
